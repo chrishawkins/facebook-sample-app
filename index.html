@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Game</title>
+  <style type="text/css">
+    body {
+      font-family: sans-serif;
+    }
+  </style>
+</head>
+<body>
+
+<fb:login-button 
+  scope="public_profile,email"
+  onlogin="checkLoginState();">
+</fb:login-button>
+
+<p id="status"></p>
+
+<script
+  src="https://code.jquery.com/jquery-2.2.4.min.js"
+  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+  crossorigin="anonymous">
+</script> 
+
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '295913870821880',
+      cookie     : true,
+      xfbml      : true,
+      version    : 'v2.8'
+    });
+    FB.AppEvents.logPageView();   
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+
+<script>
+
+  $('document').load(() => {
+    FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+    });
+  });
+
+  function checkLoginState() {
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    });
+  }
+
+  function statusChangeCallback(data) {
+
+    console.log(data);
+
+    if (data.status === 'connected') {
+
+      var userID = data.authResponse.userID;
+      var accessToken = data.authResponse.accessToken;
+
+      $.ajax({
+        dataType: "json",
+        url: `https://messenger-game-bot.herokuapp.com/color?userID=${userID}`,
+        success: (response) => {
+          $('#status').text(`You are logged in and your favourite color is: ${response.color}`);
+        }
+      });
+    } else {
+      $('#status').text('Please log in with Facebook');
+    }
+
+  }
+
+</script>
+
+</body>
+</html>
